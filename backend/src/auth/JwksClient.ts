@@ -1,5 +1,6 @@
 import Axios from 'axios';
 
+// based of this example: https://gist.github.com/westmark/faee223e05bcbab433bfd4ed8e36fb5f
 
 function certToPEM(cert: string) : string {
     let pem = cert.match( /.{1,64}/g ).join( '\n' );
