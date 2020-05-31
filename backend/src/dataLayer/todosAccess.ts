@@ -6,7 +6,7 @@ import { TodoUpdate } from '../models/TodoUpdate'
 import { Key } from '../types';
 
 const XAWS = AWSXRay.captureAWS(AWS);
-const userIdIndex = process.env.USER_ID_INDEX;
+const dueDateIndex = process.env.DUE_DATE_INDEX;
 const bucketName = process.env.IMAGES_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
 
@@ -20,7 +20,7 @@ export class TodoAccess {
     async getAllTodoItems(userId: string): Promise<TodoItem[]> {
         const result = await this.docClient.query({
             TableName: this.todosTable,
-            IndexName: userIdIndex,
+            IndexName: dueDateIndex,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
                 ':userId':userId
@@ -31,16 +31,16 @@ export class TodoAccess {
         return items as TodoItem[];
     }
 
-    async getSingleTodoItem(todoId: string): Promise<TodoItem>{
-        const result = await this.docClient.query({
-            TableName: this.todosTable,
-            KeyConditionExpression: 'todoId = :todoId',
-            ExpressionAttributeValues: {
-                ':todoId':todoId
-            }
+    async getSingleTodoItem(tableKey: Key): Promise<TodoItem>{
+        const result = await this.docClient.get({
+          TableName: this.todosTable,
+          Key: {
+            userId: tableKey.userId,
+            todoId: tableKey.todoId
+          }
         })
         .promise();
-        return result.Items[0] as TodoItem;
+        return result.Item as TodoItem;
     } 
 
     async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
@@ -57,8 +57,8 @@ export class TodoAccess {
         await this.docClient.update({
             TableName: this.todosTable,
             Key: {
-                todoId: tableKey.todoId,
-                createdAt: tableKey.createdAt
+                userId: tableKey.userId,
+                todoId: tableKey.todoId
             },
             ExpressionAttributeNames: {
                 "#n": "name"
@@ -77,8 +77,8 @@ export class TodoAccess {
         await this.docClient.delete({
             TableName: this.todosTable,
             Key: {
+                userId: tableKey.userId,
                 todoId: tableKey.todoId,
-                createdAt: tableKey.createdAt
             },
         }).promise();
 

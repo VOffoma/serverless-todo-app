@@ -3,6 +3,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } f
 import { getUploadUrl, getSingleTodoItem } from '../../businessLogic/todos';
 import { getUserId } from '../utils';
 import { createLogger } from '../../utils/logger';
+import { Key } from '../../types';
 
 const logger = createLogger('generate-upload-url');
 
@@ -13,8 +14,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
   try {
     const userId = getUserId(event);
-
-    const todoItem = await getSingleTodoItem(todoId);
+    const tableKey: Key = {userId, todoId};
+    const todoItem = await getSingleTodoItem(tableKey);
   
     if(!todoItem) {
         throw new Error('this todoItem does not exist');

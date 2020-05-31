@@ -24,8 +24,8 @@ export async function createTodoItem(createTodoRequest: CreateTodoRequest, userI
         done: false,
     });
 }
-export async function getSingleTodoItem(todoId: string): Promise<TodoItem> {
-    return todoAccess.getSingleTodoItem(todoId);
+export async function getSingleTodoItem(tableKey: Key): Promise<TodoItem> {
+    return todoAccess.getSingleTodoItem(tableKey);
 }
 
 export async function updateTodoItem(updateTodoRequest: UpdateTodoRequest, tableKey: Key): Promise<void> {

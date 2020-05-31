@@ -17,8 +17,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   try {
     const userId = getUserId(event);
-
-    const todoItemForDelete = await getSingleTodoItem(todoId);
+    const tableKey: Key = {userId, todoId}
+    const todoItemForDelete = await getSingleTodoItem(tableKey);
 
     if(!todoItemForDelete) {
         throw new Error('this todoItem does not exist');
@@ -28,7 +28,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         throw new Error('You can not make changes to this todoItem because you did not create it');
     }
 
-    const tableKey: Key = {todoId, createdAt: todoItemForDelete.createdAt}
+    
     await deleteTodoItem(tableKey);
 
     logger.info('todoitem has been deleted. TodoItem: ', todoId);

@@ -20,7 +20,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
     try {
         const userId = getUserId(event);
-        const todoItemForUpdate = await getSingleTodoItem(todoId);
+        const tableKey: Key = {userId, todoId};
+        const todoItemForUpdate = await getSingleTodoItem(tableKey);
 
         if(!todoItemForUpdate) {
             throw new Error('this todoItem does not exist');
@@ -30,7 +31,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
             throw new Error('You can not make changes to this todoItem because you did not create it');
         }
 
-        const tableKey: Key = {todoId, createdAt: todoItemForUpdate.createdAt}
         await updateTodoItem(updatedTodo, tableKey);
 
         logger.info('todoitem has been updated');
